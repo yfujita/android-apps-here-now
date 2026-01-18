@@ -28,7 +28,7 @@ class ElevationService {
                 else -> null
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("ElevationService", "Error fetching elevation", e)
             null
         }
     }
