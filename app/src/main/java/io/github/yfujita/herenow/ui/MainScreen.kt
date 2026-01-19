@@ -185,7 +185,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
                             InfoRow(
                                 label = "気圧",
-                                value = if (uiState.pressure != null) String.format("%.1f hPa", uiState.pressure) else uiState.pressureStatus,
+                                value = if (uiState.pressure != null) String.format("%.0f hPa", uiState.pressure) else uiState.pressureStatus,
                                 isHighlight = true,
                                 icon = Icons.Default.Speed
                             )
