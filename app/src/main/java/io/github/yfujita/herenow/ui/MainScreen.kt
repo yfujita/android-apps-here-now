@@ -35,13 +35,16 @@ import androidx.compose.material.icons.filled.Train
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -178,27 +181,72 @@ private fun MainContent(
     val statusLoading = stringResource(R.string.status_loading)
     val statusLoadingAddress = stringResource(R.string.status_loading_address)
     val statusUnknown = stringResource(R.string.status_unknown)
+    var showCreditDialog by remember { mutableStateOf(false) }
 
-    Text(
-        text = stringResource(R.string.app_title),
-        style =
-            MaterialTheme.typography.headlineMedium.copy(
-                color = Color.White,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp,
-                shadow =
-                    Shadow(
-                        color = Color.Black.copy(alpha = 0.5f),
-                        offset = Offset(0f, 4f),
-                        blurRadius = 8f,
-                    ),
-            ),
-        modifier =
-            Modifier.semantics {
-                contentDescription = appTitleDescription
+    // Title
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(R.string.app_title),
+            style =
+                MaterialTheme.typography.headlineMedium.copy(
+                    color = Color.White,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp,
+                    shadow =
+                        Shadow(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            offset = Offset(0f, 4f),
+                            blurRadius = 8f,
+                        ),
+                ),
+            modifier =
+                Modifier.semantics {
+                    contentDescription = appTitleDescription
+                },
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Info Button
+        IconButton(onClick = { showCreditDialog = true }) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = "クレジット情報の表示",
+                tint = Color.White.copy(alpha = 0.7f),
+            )
+        }
+    }
+
+    // Credit Dialogs
+    if (showCreditDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreditDialog = false },
+            title = { Text("クレジット") },
+            text = {
+                Column {
+                    Text("本アプリは以下のデータを利用しています。")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("出典：「位置参照情報ダウンロードサービス」（国土交通省）を加工して作成")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("HeartRails Geo API / Express")
+                    Text("国土地理院 標高API")
+                }
             },
-    )
+            confirmButton = {
+                TextButton(onClick = { showCreditDialog = false }) {
+                    Text("閉じる")
+                }
+            },
+            containerColor = Color(0xFF1E293B),
+            titleContentColor = Color.White,
+            textContentColor = Color.White.copy(alpha = 0.9f),
+        )
+    }
+
     Spacer(modifier = Modifier.height(32.dp))
 
     GlassCard(
