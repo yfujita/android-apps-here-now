@@ -10,8 +10,8 @@ class AddressService(private val api: AddressApi) {
         lon: Double,
     ): String? {
         return try {
-            val response = api.searchByGeoLocation(x = lon, y = lat)
-            val location = response.response?.location?.firstOrNull()
+            val response: AddressResponse = api.searchByGeoLocation(x = lon, y = lat)
+            val location: LocationInfo? = response.response?.location?.firstOrNull()
             if (location != null) {
                 "${location.prefecture}${location.city}${location.town}"
             } else {
