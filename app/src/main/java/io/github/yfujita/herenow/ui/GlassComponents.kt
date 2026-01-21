@@ -23,102 +23,120 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun AnimatedAuroraBackground() {
     val infiniteTransition = rememberInfiniteTransition(label = "aurora")
-    
-    // Animate gradients
+
     val t1: Float by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(12000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "t1"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(12000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "t1",
     )
 
     val t2: Float by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(18000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "t2"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(18000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "t2",
     )
 
     val t3: Float by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(25000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "t3"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(25000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "t3",
     )
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFF0F172A))) { // Dark deep blue base
-        
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color(0xFF0F172A)),
+    ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width
             val height = size.height
-            
-            // Aurora 1 (Indigo) - Moving mostly horizontally
+
             drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFF6366F1).copy(alpha = 0.3f),
-                        Color.Transparent
+                brush =
+                    Brush.radialGradient(
+                        colors =
+                            listOf(
+                                Color(0xFF6366F1).copy(alpha = 0.3f),
+                                Color.Transparent,
+                            ),
+                        center =
+                            Offset(
+                                width * 0.2f + width * 0.5f * t1,
+                                height * 0.3f + height * 0.1f * t2,
+                            ),
+                        radius = width * 1.0f,
                     ),
-                    center = Offset(width * 0.2f + width * 0.5f * t1, height * 0.3f + height * 0.1f * t2),
-                    radius = width * 1.0f
-                )
             )
-            
-            // Aurora 2 (Pink/Purple) - Moving diagonaly
+
             drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFFEC4899).copy(alpha = 0.25f),
-                        Color.Transparent
+                brush =
+                    Brush.radialGradient(
+                        colors =
+                            listOf(
+                                Color(0xFFEC4899).copy(alpha = 0.25f),
+                                Color.Transparent,
+                            ),
+                        center =
+                            Offset(
+                                width * 0.9f - width * 0.6f * t2,
+                                height * 0.6f + height * 0.2f * t3,
+                            ),
+                        radius = width * 1.1f,
                     ),
-                    center = Offset(width * 0.9f - width * 0.6f * t2, height * 0.6f + height * 0.2f * t3),
-                    radius = width * 1.1f
-                )
             )
-            
-             // Aurora 3 (Emerald/Teal) - Slow drifting
+
             drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFF10B981).copy(alpha = 0.2f),
-                        Color.Transparent
+                brush =
+                    Brush.radialGradient(
+                        colors =
+                            listOf(
+                                Color(0xFF10B981).copy(alpha = 0.2f),
+                                Color.Transparent,
+                            ),
+                        center =
+                            Offset(
+                                width * 0.5f + width * 0.2f * t3,
+                                height * 0.8f - height * 0.4f * t1,
+                            ),
+                        radius = width * 0.9f,
                     ),
-                    center = Offset(width * 0.5f + width * 0.2f * t3, height * 0.8f - height * 0.4f * t1),
-                    radius = width * 0.9f
-                )
             )
         }
-        
-        // Overlay a noise texture or subtle gradient to smooth things out if needed
+
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color(0xFF0F172A).copy(alpha = 0.3f)
-                        )
-                    )
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors =
+                                listOf(
+                                    Color.Transparent,
+                                    Color(0xFF0F172A).copy(alpha = 0.3f),
+                                ),
+                        ),
+                    ),
         )
     }
 }
@@ -126,57 +144,74 @@ fun AnimatedAuroraBackground() {
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit
+    glassAlpha: Float = 0.08f,
+    borderColor: Color? = null,
+    content: @Composable BoxScope.() -> Unit,
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
-    ) {
-        // Background Layer with Blur
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .then(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Modifier.blur(30.dp)
-                    } else {
-                        Modifier
-                    }
-                )
-                .background(Color.White.copy(alpha = 0.08f))
-        )
-        
-        // Border and Gradient Overlay Layer (Sharp)
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .border(
-                    width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.4f), // Slightly stronger top highlight
-                            Color.White.copy(alpha = 0.1f), // Fades out
-                            Color.White.copy(alpha = 0.05f)
-                        )
+    val borderBrush =
+        if (borderColor != null) {
+            Brush.verticalGradient(
+                colors =
+                    listOf(
+                        borderColor.copy(alpha = 0.6f),
+                        borderColor.copy(alpha = 0.3f),
+                        borderColor.copy(alpha = 0.1f),
                     ),
-                    shape = RoundedCornerShape(24.dp)
-                )
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.05f),
-                            Color.White.copy(alpha = 0.01f)
-                        ),
-                        start = Offset(0f, 0f),
-                        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+            )
+        } else {
+            Brush.verticalGradient(
+                colors =
+                    listOf(
+                        Color.White.copy(alpha = 0.4f),
+                        Color.White.copy(alpha = 0.1f),
+                        Color.White.copy(alpha = 0.05f),
+                    ),
+            )
+        }
+
+    Box(
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(24.dp)),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .then(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            Modifier.blur(30.dp)
+                        } else {
+                            Modifier
+                        },
                     )
-                )
+                    .background(Color.White.copy(alpha = glassAlpha)),
         )
 
-        // Content Layer (No Blur)
         Box(
-            content = content
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .border(
+                        width = 1.dp,
+                        brush = borderBrush,
+                        shape = RoundedCornerShape(24.dp),
+                    )
+                    .background(
+                        brush =
+                            Brush.linearGradient(
+                                colors =
+                                    listOf(
+                                        Color.White.copy(alpha = 0.05f),
+                                        Color.White.copy(alpha = 0.01f),
+                                    ),
+                                start = Offset(0f, 0f),
+                                end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY),
+                            ),
+                    ),
         )
+
+        Box(content = content)
     }
 }
 
@@ -184,53 +219,57 @@ fun GlassCard(
 fun GlassButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(32.dp))
-            .clickable(onClick = onClick),
-        contentAlignment = androidx.compose.ui.Alignment.Center
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(32.dp))
+                .clickable(onClick = onClick),
+        contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
-        // Background Layer
         Box(
-            modifier = Modifier
-                .matchParentSize()
-                .then(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        Modifier.blur(15.dp)
-                    } else {
-                        Modifier
-                    }
-                )
-                .background(Color.White.copy(alpha = 0.15f))
-        )
-        
-        // Border and Overlay
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .border(
-                    width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.5f),
-                            Color.White.copy(alpha = 0.1f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(32.dp)
-                )
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.1f),
-                            Color.White.copy(alpha = 0.02f)
-                        )
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .then(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            Modifier.blur(15.dp)
+                        } else {
+                            Modifier
+                        },
                     )
-                )
+                    .background(Color.White.copy(alpha = 0.15f)),
         )
 
-        // Content
+        Box(
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .border(
+                        width = 1.dp,
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        Color.White.copy(alpha = 0.5f),
+                                        Color.White.copy(alpha = 0.1f),
+                                    ),
+                            ),
+                        shape = RoundedCornerShape(32.dp),
+                    )
+                    .background(
+                        brush =
+                            Brush.linearGradient(
+                                colors =
+                                    listOf(
+                                        Color.White.copy(alpha = 0.1f),
+                                        Color.White.copy(alpha = 0.02f),
+                                    ),
+                            ),
+                    ),
+        )
+
         Box(content = content)
     }
 }

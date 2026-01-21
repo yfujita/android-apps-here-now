@@ -1,3 +1,52 @@
 <resources>
     <string name="app_name">Here Now</string>
+    <string name="app_title">HERE NOW</string>
+    <string name="app_title_description">現在地情報アプリ HereNow</string>
+
+    <!-- Labels -->
+    <string name="label_address">住所</string>
+    <string name="label_nearest_station">最寄駅</string>
+    <string name="label_elevation">標高</string>
+    <string name="label_pressure">気圧</string>
+    <string name="label_gravity">重力加速度</string>
+    <string name="label_latitude">緯度</string>
+    <string name="label_longitude">経度</string>
+
+    <!-- Status -->
+    <string name="status_loading">Loading…</string>
+    <string name="status_loading_address">住所を取得中…</string>
+    <string name="status_waiting">Waiting…</string>
+    <string name="status_success">Success</string>
+    <string name="status_unknown">不明</string>
+    <string name="status_no_sensor">No Sensor</string>
+    <string name="status_error_unknown">Error/Unknown</string>
+
+    <!-- Formats -->
+    <string name="format_elevation">%s m</string>
+    <string name="format_pressure">%.0f hPa</string>
+    <string name="format_gravity">%.4f m/s²</string>
+    <string name="format_station">%1$s (%2$s)</string>
+    <string name="format_distance">%sm</string>
+
+    <!-- Buttons -->
+    <string name="button_open_map">地図で開く</string>
+    <string name="button_grant_permission">権限を許可</string>
+
+    <!-- Permission -->
+    <string name="permission_required">位置情報の権限が必要です</string>
+    <string name="permission_required_description">位置情報の権限が必要です。標高や住所などの情報を表示するには権限を許可してください。</string>
+    <string name="permission_button_description">位置情報の権限を許可するボタン</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_warning">警告</string>
+    <string name="accessibility_close">閉じる</string>
+    <string name="accessibility_close_error">エラーを閉じる</string>
+    <string name="accessibility_error_format">エラー: %s</string>
+    <string name="accessibility_open_map_format">%sを地図で開く</string>
+    <string name="accessibility_map_icon">地図アイコン</string>
+
+    <!-- Errors -->
+    <string name="error_elevation">標高データの取得に失敗しました</string>
+    <string name="error_address">住所の取得に失敗しました</string>
+    <string name="error_station">最寄り駅の取得に失敗しました</string>
 </resources>
