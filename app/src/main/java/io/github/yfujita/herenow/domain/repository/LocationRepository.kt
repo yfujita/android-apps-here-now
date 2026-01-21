@@ -32,6 +32,11 @@ interface StationRepository {
         latitude: Double,
         longitude: Double,
     ): Result<StationData?>
+
+    suspend fun getNearestStations(
+        latitude: Double,
+        longitude: Double,
+    ): Result<List<StationData>>
 }
 
 interface GravityRepository {

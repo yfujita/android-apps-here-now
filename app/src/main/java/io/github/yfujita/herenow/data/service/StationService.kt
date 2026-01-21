@@ -17,6 +17,20 @@ class StationService(private val api: StationApi) {
             null
         }
     }
+
+    suspend fun getNearestStations(
+        lat: Double,
+        lon: Double,
+        limit: Int = 5,
+    ): List<Station> {
+        return try {
+            val response = api.getStations(x = lon, y = lat)
+            response.response?.station?.take(limit) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("StationService", "Error fetching stations", e)
+            emptyList()
+        }
+    }
 }
 
 data class StationResponse(
