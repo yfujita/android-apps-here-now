@@ -10,7 +10,7 @@ class StationService(private val api: StationApi) {
         lon: Double,
     ): Station? {
         return try {
-            val response = api.getStations(x = lon, y = lat)
+            val response: StationResponse = api.getStations(x = lon, y = lat)
             response.response?.station?.firstOrNull()
         } catch (e: Exception) {
             Log.e("StationService", "Error fetching station", e)
@@ -24,7 +24,7 @@ class StationService(private val api: StationApi) {
         limit: Int = 5,
     ): List<Station> {
         return try {
-            val response = api.getStations(x = lon, y = lat)
+            val response: StationResponse = api.getStations(x = lon, y = lat)
             response.response?.station?.take(limit) ?: emptyList()
         } catch (e: Exception) {
             Log.e("StationService", "Error fetching stations", e)

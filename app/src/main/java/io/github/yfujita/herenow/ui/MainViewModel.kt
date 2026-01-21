@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.yfujita.herenow.domain.model.AddressData
+import io.github.yfujita.herenow.domain.model.ElevationData
+import io.github.yfujita.herenow.domain.model.GravityData
+import io.github.yfujita.herenow.domain.model.PressureData
 import io.github.yfujita.herenow.domain.model.Result
 import io.github.yfujita.herenow.domain.model.StationData
 import io.github.yfujita.herenow.domain.repository.AddressRepository
@@ -13,6 +17,7 @@ import io.github.yfujita.herenow.domain.repository.LocationRepository
 import io.github.yfujita.herenow.domain.repository.SensorRepository
 import io.github.yfujita.herenow.domain.repository.StationRepository
 import io.github.yfujita.herenow.util.AppConstants
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +55,9 @@ class MainViewModel
                 viewModelScope.launch {
                     Log.d(TAG, "Start location updates (1 minute interval)")
 
-                    locationRepository.getLocationUpdates(AppConstants.LOCATION_UPDATE_INTERVAL_MS).collectLatest { location ->
+                    // Fetch location updates with explicit interval
+                    locationRepository.getLocationUpdates(AppConstants.LOCATION_UPDATE_INTERVAL_MS).collectLatest {
+                            location: io.github.yfujita.herenow.domain.model.LocationData ->
                         Log.d(TAG, "Location update: lat=${location.latitude}, lon=${location.longitude}")
                         _uiState.value =
                             _uiState.value.copy(
@@ -61,38 +68,40 @@ class MainViewModel
                             )
 
                         Log.d(TAG, "Fetching location details...")
-                        val elevationDeferred =
+                        // Fetch details concurrently for better performance
+                        val elevationDeferred: Deferred<Result<ElevationData?>> =
                             async {
                                 elevationRepository.getElevation(location.latitude, location.longitude)
                             }
-                        val addressDeferred =
+                        val addressDeferred: Deferred<Result<AddressData?>> =
                             async {
                                 addressRepository.getAddress(location.latitude, location.longitude)
                             }
-                        val stationsDeferred =
+                        val stationsDeferred: Deferred<Result<List<StationData>>> =
                             async {
                                 stationRepository.getNearestStations(location.latitude, location.longitude)
                             }
 
-                        val elevationResult = elevationDeferred.await()
-                        val addressResult = addressDeferred.await()
-                        val stationsResult = stationsDeferred.await()
+                        val elevationResult: Result<ElevationData?> = elevationDeferred.await()
+                        val addressResult: Result<AddressData?> = addressDeferred.await()
+                        val stationsResult: Result<List<StationData>> = stationsDeferred.await()
 
-                        val elevation = elevationResult.getOrNull()
-                        val address = addressResult.getOrNull()
-                        val stations = stationsResult.getOrNull() ?: emptyList()
-                        val nearestStation = stations.firstOrNull()
+                        val elevation: ElevationData? = elevationResult.getOrNull()
+                        val address: AddressData? = addressResult.getOrNull()
+                        val stations: List<StationData> = stationsResult.getOrNull() ?: emptyList()
+                        val nearestStation: StationData? = stations.firstOrNull()
 
                         Log.d(TAG, "Elevation: ${elevation?.elevation} m")
                         Log.d(TAG, "Address: ${address?.fullAddress}")
                         Log.d(TAG, "Stations: ${stations.size} found, nearest: ${nearestStation?.name}")
 
-                        val gravity =
-                            elevation?.let {
-                                gravityRepository.calculateGravity(location.latitude, it.elevation)
+                        // Calculate gravity if elevation is available
+                        val gravity: GravityData? =
+                            elevation?.let { elevationData: ElevationData ->
+                                gravityRepository.calculateGravity(location.latitude, elevationData.elevation)
                             }
 
-                        val errorMessage = buildErrorMessage(elevationResult, addressResult, stationsResult)
+                        val errorMessage: String? = buildErrorMessage(elevationResult, addressResult, stationsResult)
 
                         _uiState.value =
                             _uiState.value.copy(
@@ -115,7 +124,8 @@ class MainViewModel
             if (pressureJob?.isActive != true) {
                 pressureJob =
                     viewModelScope.launch {
-                        sensorRepository.getPressureFlow().collectLatest { pressure ->
+                        // Observe pressure sensor updates
+                        sensorRepository.getPressureFlow().collectLatest { pressure: PressureData? ->
                             _uiState.value =
                                 _uiState.value.copy(
                                     pressure = pressure?.pressure,
@@ -139,9 +149,10 @@ class MainViewModel
         }
 
         fun toggleStationListExpanded() {
-            _uiState.value = _uiState.value.copy(
-                isStationListExpanded = !_uiState.value.isStationListExpanded,
-            )
+            _uiState.value =
+                _uiState.value.copy(
+                    isStationListExpanded = !_uiState.value.isStationListExpanded,
+                )
         }
 
         private fun buildErrorMessage(
@@ -149,7 +160,7 @@ class MainViewModel
             addressResult: Result<*>,
             stationResult: Result<*>,
         ): String? {
-            val errors = mutableListOf<String>()
+            val errors: MutableList<String> = mutableListOf()
 
             if (elevationResult is Result.Error) {
                 errors.add(elevationResult.message)

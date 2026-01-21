@@ -233,11 +233,12 @@ private fun MainContent(
             InfoDivider()
 
             InfoRow(
-                label = if (uiState.stationLine != null) {
-                    "$labelStation - ${uiState.stationLine}"
-                } else {
-                    labelStation
-                },
+                label =
+                    if (uiState.stationLine != null) {
+                        "$labelStation - ${uiState.stationLine}"
+                    } else {
+                        labelStation
+                    },
                 value = "${uiState.stationName ?: statusUnknown} (${uiState.stationDistance ?: "-m"})",
                 isHighlight = true,
                 icon = Icons.Default.Train,
@@ -270,17 +271,19 @@ private fun MainContent(
                                 imageVector = Icons.Outlined.ExpandMore,
                                 contentDescription = null,
                                 tint = Color.White.copy(alpha = 0.9f),
-                                modifier = Modifier
-                                    .width(18.dp)
-                                    .height(18.dp),
+                                modifier =
+                                    Modifier
+                                        .width(18.dp)
+                                        .height(18.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "他の駅を見る (${uiState.stations.size - 1}件)",
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    color = Color.White.copy(alpha = 0.9f),
-                                    fontWeight = FontWeight.Bold,
-                                ),
+                                style =
+                                    MaterialTheme.typography.labelMedium.copy(
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontWeight = FontWeight.Bold,
+                                    ),
                             )
                         }
                     }
@@ -331,17 +334,19 @@ private fun MainContent(
                                     imageVector = Icons.Outlined.ExpandLess,
                                     contentDescription = null,
                                     tint = Color.White.copy(alpha = 0.9f),
-                                    modifier = Modifier
-                                        .width(18.dp)
-                                        .height(18.dp),
+                                    modifier =
+                                        Modifier
+                                            .width(18.dp)
+                                            .height(18.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "表示を減らす",
-                                    style = MaterialTheme.typography.labelMedium.copy(
-                                        color = Color.White.copy(alpha = 0.9f),
-                                        fontWeight = FontWeight.Bold,
-                                    ),
+                                    style =
+                                        MaterialTheme.typography.labelMedium.copy(
+                                            color = Color.White.copy(alpha = 0.9f),
+                                            fontWeight = FontWeight.Bold,
+                                        ),
                                 )
                             }
                         }
