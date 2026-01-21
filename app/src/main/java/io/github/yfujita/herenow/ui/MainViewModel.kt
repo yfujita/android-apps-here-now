@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.yfujita.herenow.domain.model.Result
+import io.github.yfujita.herenow.domain.model.StationData
 import io.github.yfujita.herenow.domain.repository.AddressRepository
 import io.github.yfujita.herenow.domain.repository.ElevationRepository
 import io.github.yfujita.herenow.domain.repository.GravityRepository
@@ -68,39 +69,43 @@ class MainViewModel
                             async {
                                 addressRepository.getAddress(location.latitude, location.longitude)
                             }
-                        val stationDeferred =
+                        val stationsDeferred =
                             async {
-                                stationRepository.getNearestStation(location.latitude, location.longitude)
+                                stationRepository.getNearestStations(location.latitude, location.longitude)
                             }
 
                         val elevationResult = elevationDeferred.await()
                         val addressResult = addressDeferred.await()
-                        val stationResult = stationDeferred.await()
+                        val stationsResult = stationsDeferred.await()
 
                         val elevation = elevationResult.getOrNull()
                         val address = addressResult.getOrNull()
-                        val station = stationResult.getOrNull()
+                        val stations = stationsResult.getOrNull() ?: emptyList()
+                        val nearestStation = stations.firstOrNull()
 
                         Log.d(TAG, "Elevation: ${elevation?.elevation} m")
                         Log.d(TAG, "Address: ${address?.fullAddress}")
-                        Log.d(TAG, "Station: ${station?.name}")
+                        Log.d(TAG, "Stations: ${stations.size} found, nearest: ${nearestStation?.name}")
 
                         val gravity =
                             elevation?.let {
                                 gravityRepository.calculateGravity(location.latitude, it.elevation)
                             }
 
-                        val errorMessage = buildErrorMessage(elevationResult, addressResult, stationResult)
+                        val errorMessage = buildErrorMessage(elevationResult, addressResult, stationsResult)
 
                         _uiState.value =
                             _uiState.value.copy(
                                 elevation = elevation?.elevation,
                                 elevationStatus = if (elevation != null) "Success" else "Error/Unknown",
                                 address = address?.fullAddress,
-                                stationName = station?.name,
-                                stationDistance = station?.distance,
-                                stationLatitude = station?.latitude,
-                                stationLongitude = station?.longitude,
+                                stationName = nearestStation?.name,
+                                stationDistance = nearestStation?.distance,
+                                stationLine = nearestStation?.line,
+                                stationLatitude = nearestStation?.latitude,
+                                stationLongitude = nearestStation?.longitude,
+                                stations = stations,
+                                isStationListExpanded = false,
                                 gravity = gravity?.gravity,
                                 error = errorMessage,
                             )
@@ -131,6 +136,12 @@ class MainViewModel
 
         fun clearError() {
             _uiState.value = _uiState.value.copy(error = null)
+        }
+
+        fun toggleStationListExpanded() {
+            _uiState.value = _uiState.value.copy(
+                isStationListExpanded = !_uiState.value.isStationListExpanded,
+            )
         }
 
         private fun buildErrorMessage(
@@ -166,7 +177,10 @@ data class UiState(
     val pressureStatus: String = "-",
     val stationName: String? = null,
     val stationDistance: String? = null,
+    val stationLine: String? = null,
     val stationLatitude: Double? = null,
     val stationLongitude: Double? = null,
+    val stations: List<StationData> = emptyList(),
+    val isStationListExpanded: Boolean = false,
     val error: String? = null,
 )

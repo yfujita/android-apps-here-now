@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Train
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -127,6 +129,7 @@ fun MainScreen(viewModel: MainViewModel) {
                         MainContent(
                             uiState = uiState,
                             context = context,
+                            onToggleStationList = { viewModel.toggleStationListExpanded() },
                         )
                     } else {
                         PermissionRequestCard(
@@ -162,6 +165,7 @@ fun MainScreen(viewModel: MainViewModel) {
 private fun MainContent(
     uiState: UiState,
     context: Context,
+    onToggleStationList: () -> Unit,
 ) {
     val appTitleDescription = stringResource(R.string.app_title_description)
     val labelAddress = stringResource(R.string.label_address)
@@ -229,7 +233,11 @@ private fun MainContent(
             InfoDivider()
 
             InfoRow(
-                label = labelStation,
+                label = if (uiState.stationLine != null) {
+                    "$labelStation - ${uiState.stationLine}"
+                } else {
+                    labelStation
+                },
                 value = "${uiState.stationName ?: statusUnknown} (${uiState.stationDistance ?: "-m"})",
                 isHighlight = true,
                 icon = Icons.Default.Train,
@@ -244,6 +252,102 @@ private fun MainContent(
                     }
                 },
             )
+
+            // 他の駅を見るボタン（2件以上ある場合のみ表示）
+            if (uiState.stations.size > 1) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (!uiState.isStationListExpanded) {
+                    GlassButton(
+                        onClick = onToggleStationList,
+                        modifier = Modifier.height(40.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ExpandMore,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.9f),
+                                modifier = Modifier
+                                    .width(18.dp)
+                                    .height(18.dp),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "他の駅を見る (${uiState.stations.size - 1}件)",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    fontWeight = FontWeight.Bold,
+                                ),
+                            )
+                        }
+                    }
+                }
+
+                // 展開時の駅リスト
+                AnimatedVisibility(
+                    visible = uiState.isStationListExpanded,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically(),
+                ) {
+                    Column {
+                        uiState.stations.drop(1).forEach { station ->
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalDivider(
+                                color = Color.White.copy(alpha = 0.1f),
+                                thickness = 1.dp,
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            InfoRow(
+                                label = station.line ?: "駅",
+                                value = "${station.name} (${station.distance})",
+                                isHighlight = false,
+                                icon = Icons.Default.Train,
+                                onMapClick = {
+                                    openGoogleMap(
+                                        context,
+                                        station.latitude,
+                                        station.longitude,
+                                        station.name,
+                                    )
+                                },
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        GlassButton(
+                            onClick = onToggleStationList,
+                            modifier = Modifier.height(40.dp),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.ExpandLess,
+                                    contentDescription = null,
+                                    tint = Color.White.copy(alpha = 0.9f),
+                                    modifier = Modifier
+                                        .width(18.dp)
+                                        .height(18.dp),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "表示を減らす",
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        fontWeight = FontWeight.Bold,
+                                    ),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
             InfoDivider()
 
