@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.yfujita.herenow.domain.model.AddressData
 import io.github.yfujita.herenow.domain.model.ElevationData
 import io.github.yfujita.herenow.domain.model.GravityData
+import io.github.yfujita.herenow.domain.model.LocationData
 import io.github.yfujita.herenow.domain.model.PressureData
 import io.github.yfujita.herenow.domain.model.Result
 import io.github.yfujita.herenow.domain.model.StationData
@@ -57,7 +58,7 @@ class MainViewModel
 
                     // Fetch location updates with explicit interval
                     locationRepository.getLocationUpdates(AppConstants.LOCATION_UPDATE_INTERVAL_MS).collectLatest {
-                            location: io.github.yfujita.herenow.domain.model.LocationData ->
+                            location: LocationData ->
                         Log.d(TAG, "Location update: lat=${location.latitude}, lon=${location.longitude}")
                         _uiState.value =
                             _uiState.value.copy(
